@@ -5,73 +5,72 @@ import java.util.List;
 import java.util.Scanner;
 
 public class MazeSolver {
-    int[] navgeableRows = {-1, 0, 0, 1};
-    int[] navegableColumns = {-1, 0, 0, 1};
-    public static String[][] maze = getMaze("src/input.txt") ;
-    public static int[][] visited;
-    public ArrayList<List<Integer>> solutionMaze = new ArrayList<List<Integer>>();
+    int[] navgeableRows = {-1, 0, 1, 0};
+    int[] navegableColumns = {0, 1, 0, -1};
+
+    public static String[][] maze = getMaze("input.txt");
+    public static boolean[][] visited;
+
+    public ArrayList<List<Integer>> solutionMaze = new ArrayList<>();
+
     String block = "#";
     String move = ".";
+
     int coordX;
     int coordY;
 
     public int[] getCoordinates() {
-        int[] coordinates = {coordX, coordX};
+        int[] coordinates = {coordX, coordY};
         return coordinates;
     }
 
-    public int[] getNavgeableRows() {
-        return navgeableRows;
-    }
-
-    public void setNavgeableRows(int[] navgeableRows) {
-        this.navgeableRows = navgeableRows;
-    }
-
-    public int[] getNavegableColumns() {
-        return navegableColumns;
-    }
-
-    public void setNavegableColumns(int[] navegableColumns) {
-        this.navegableColumns = navegableColumns;
-    }
-
     public static String[][] getMaze(String fileName) {
-        File f = new File("input.txt");
+        File f = new File(fileName);
         Scanner s = null;
         try {
             s = new Scanner(f);
-        }
-        catch (FileNotFoundException e) {
-            System.out.println("File not found.");
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + fileName);
             System.exit(1);
         }
 
-        ArrayList<String> fileData = new ArrayList<String>();
-        while (s.hasNextLine())
+        ArrayList<String> fileData = new ArrayList<>();
+        while (s.hasNextLine()) {
             fileData.add(s.nextLine());
+        }
+        s.close();
 
         int rows = fileData.size();
         int cols = fileData.get(0).length();
 
         String[][] Maze = new String[rows][cols];
 
-        for (int i = 0; i < fileData.size(); i++) {
-            String d = fileData.get(i);
-            for (int j = 0; j < d.length(); j++) {
-                Maze[i][j] = d.charAt(j) + "";
+        for (int i = 0; i < rows; i++) {
+            String line = fileData.get(i);
+            for (int j = 0; j < cols; j++) {
+                Maze[i][j] = String.valueOf(line.charAt(j));
             }
         }
         return Maze;
     }
 
-    public int[][] solveMaze() {
-        int initialX = 0;
-        int initialY = 0;
+    /**
+     * Solve the maze recursively from (0, 0) to the (bottom-right) cell.
+     * Return the path as a list of (row, col) coords.
+     */
+    public ArrayList<List<Integer>> solveMaze() {
+        int rows = maze.length;
+        int cols = maze[0].length;
 
-        while(maze[initialX++][initialY++].equals(block.getCoordiate()) != true || maze[initialX++][initialY].equals(block.getCoordiate()) != true) {
-            solveMaze();
+        visited = new boolean[rows][cols];
+
+        // Attempt to solve the maze, starting at (0, 0).
+        boolean foundPath = MazeHelper.dfs(maze, visited, 0, 0, solutionMaze);
+
+        if (!foundPath) {
+            System.out.println("No path found!");
         }
+
         return solutionMaze;
     }
 }
